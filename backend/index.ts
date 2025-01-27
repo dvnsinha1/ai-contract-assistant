@@ -1,11 +1,11 @@
 import express from 'express';
 import type { Request, Response } from 'express';
-import cors from 'cors';
 import axios from 'axios';
 import * as dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 import { parsePDF } from './utils/pdfParser.js';
+import corsMiddleware from './cors-config.js';
 
 // Load environment variables
 const __filename = fileURLToPath(import.meta.url);
@@ -15,31 +15,11 @@ dotenv.config({ path: resolve(__dirname, '../../.env') });
 const app = express();
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3001;
 
-// Enable CORS for all routes with proper configuration
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests from localhost and Chrome extension
-    const allowedOrigins = [
-      process.env.CLIENT_URL || 'http://localhost:5173',
-      /^chrome-extension:\/\/.*/
-    ];
-    
-    if (!origin || allowedOrigins.some(allowed => 
-      typeof allowed === 'string' ? allowed === origin : allowed.test(origin)
-    )) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-  maxAge: 86400 // 24 hours
-}));
+// Enable CORS for all routes
+app.use(corsMiddleware);
 
 // Handle preflight requests
-app.options('*', cors());
+app.options('*', corsMiddleware);
 
 app.use(express.json());
 
@@ -248,27 +228,27 @@ app.post('/api/chat', async (req: Request, res: Response) => {
   }
 });
 
-// Get DocuSign OAuth URL
+// DocuSign auth URL endpoint
 app.get('/api/auth/docusign/url', (_req: Request, res: Response) => {
   try {
     if (!CLIENT_ID) {
-      throw new Error('DocuSign Client ID not configured');
+      throw new Error('DocuSign client ID not configured');
     }
 
+    // Construct the authorization URL
     const authUrl = new URL(`${DOCUSIGN_AUTH_SERVER}/oauth/auth`);
     authUrl.searchParams.append('response_type', 'code');
     authUrl.searchParams.append('scope', SCOPES.join(' '));
     authUrl.searchParams.append('client_id', CLIENT_ID);
     authUrl.searchParams.append('redirect_uri', REDIRECT_URI);
-    authUrl.searchParams.append('prompt', 'login');
-    
-    console.log('Generated auth URL:', authUrl.toString());
+
+    console.log('Generated DocuSign auth URL');
     res.json({ url: authUrl.toString() });
-  } catch (error) {
-    console.error('Error generating auth URL:', error);
+  } catch (error: any) {
+    console.error('Auth URL generation error:', error);
     res.status(500).json({ 
       error: 'Failed to generate auth URL',
-      details: error instanceof Error ? error.message : 'Unknown error'
+      details: error.message 
     });
   }
 });
