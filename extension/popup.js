@@ -2,10 +2,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const grabUrlButton = document.getElementById('grabUrl');
   const statusDiv = document.getElementById('status');
 
-  // Configuration
-  const BACKEND_URL = 'https://ai-contract-assistant-backend.vercel.app';
-  const FRONTEND_URL = 'https://ai-contract-assistant.vercel.app';
-
   // Function to validate DocuSign URL
   const isDocuSignUrl = (url) => {
     try {
@@ -34,52 +30,46 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
 
-      showStatus('Sending URL to Contract Assistant...', 'info');
-
       // Send the URL to your Contract Assistant application
-      const response = await fetch(`${BACKEND_URL}/api/contract/url`, {
+      const response = await fetch('https://ai-contract-assistant-backend.vercel.app/api/contract/url', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
         },
-        mode: 'cors',
         credentials: 'include',
         body: JSON.stringify({ url }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Network error' }));
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-      }
+      if (response.ok) {
+        showStatus('URL sent successfully! Redirecting...', 'success');
 
-      const data = await response.json();
-      showStatus('URL sent successfully! Redirecting...', 'success');
+        // Store URL in background script
+        await chrome.runtime.sendMessage({ type: 'STORE_URL', url });
 
-      // Store URL in background script
-      await chrome.runtime.sendMessage({ type: 'STORE_URL', url });
-
-      // Find or create frontend tab
-      const frontendTabs = await chrome.tabs.query({
-        url: `${FRONTEND_URL}/*`
-      });
-
-      if (frontendTabs.length > 0) {
-        // Frontend tab exists, reload it
-        await chrome.tabs.reload(frontendTabs[0].id);
-        await chrome.tabs.update(frontendTabs[0].id, { active: true });
-      } else {
-        // No frontend tab found, create one
-        chrome.tabs.create({ 
-          url: FRONTEND_URL
+        // Find or create frontend tab
+        const frontendTabs = await chrome.tabs.query({
+          url: 'https://ai-contract-assistant.vercel.app/*'
         });
-      }
 
-      // Close the popup after a short delay
-      setTimeout(() => window.close(), 1500);
+        if (frontendTabs.length > 0) {
+          // Frontend tab exists, reload it
+          await chrome.tabs.reload(frontendTabs[0].id);
+          await chrome.tabs.update(frontendTabs[0].id, { active: true });
+        } else {
+          // No frontend tab found, create one
+          chrome.tabs.create({ 
+            url: 'https://ai-contract-assistant.vercel.app'
+          });
+        }
+
+        // Close the popup after a short delay
+        setTimeout(() => window.close(), 1500);
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to send URL');
+      }
     } catch (error) {
-      console.error('Extension error:', error);
-      showStatus(`Error: ${error.message || 'Failed to connect to Contract Assistant'}`, 'error');
+      showStatus('Error: ' + error.message, 'error');
     }
   });
 }); 

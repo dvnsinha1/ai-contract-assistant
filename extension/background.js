@@ -13,7 +13,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === 'complete' && 
       tab.url && 
-      tab.url.startsWith('http://localhost:5173') && 
+      tab.url.startsWith('https://ai-contract-assistant.vercel.app') && 
       pendingUrl) {
     // Inject the content script
     chrome.scripting.executeScript({

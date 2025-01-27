@@ -6,7 +6,6 @@ import * as dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 import { parsePDF } from './utils/pdfParser.js';
-import type { CorsCallback } from 'cors';
 
 // Load environment variables
 const __filename = fileURLToPath(import.meta.url);
@@ -18,24 +17,7 @@ const port = process.env.PORT ? parseInt(process.env.PORT) : 3001;
 
 // Enable CORS for all routes with proper configuration
 app.use(cors({
-  origin: function(origin: string | undefined, callback: CorsCallback) {
-    // Allow requests from:
-    // 1. Chrome extension (chrome-extension://)
-    // 2. Frontend app (production and development)
-    // 3. Postman/local testing (null/undefined origin)
-    const allowedOrigins = [
-      'https://ai-contract-assistant.vercel.app',
-      'http://localhost:5173'
-    ];
-
-    if (!origin || // Allow requests with no origin (mobile apps, curl, etc)
-        origin.startsWith('chrome-extension://') || // Allow any Chrome extension
-        allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: ['https://ai-contract-assistant.vercel.app', 'http://localhost:5173', 'chrome-extension://*'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
@@ -45,7 +27,7 @@ app.use(cors({
 // Handle preflight requests
 app.options('*', cors());
 
-app.use(express.json({ limit: '10mb' })); // Increase payload limit for large contracts
+app.use(express.json());
 
 // Add endpoint to receive URLs from Chrome extension
 app.post('/api/contract/url', async (req: Request, res: Response) => {
