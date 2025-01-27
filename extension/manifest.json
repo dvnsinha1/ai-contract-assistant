@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Docusign Contract Assistant",
+  "version": "1.0",
+  "description": "Automatically analyze contracts from DocuSign URLs with Contract Assistant",
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "scripting"
+  ],
+  "host_permissions": [
+    "http://localhost:3001/*",
+    "http://localhost:5173/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "icons": {
+    "128": "icon.png"
+  }
+} 

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="48" height="48" rx="8" fill="#2563eb"/>
+  
+  <!-- Document shape -->
+  <path d="M12 6h18l6 6v30H12V6z" fill="white"/>
+  
+  <!-- Document lines -->
+  <path d="M18 18h12M18 24h12M18 30h12" stroke="#2563eb" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- AI circuit symbol -->
+  <circle cx="24" cy="36" r="3" fill="#2563eb"/>
+  <path d="M24 33v-3M21 36h-3M27 36h3" stroke="#2563eb" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Document fold -->
+  <path d="M30 6l6 6h-6V6z" fill="#e2e8f0"/>
+</svg> 

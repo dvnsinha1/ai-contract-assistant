@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="16" height="16" rx="3" fill="#2563eb"/>
+  
+  <!-- Document shape -->
+  <path d="M4 2h6l2 2v10H4V2z" fill="white"/>
+  
+  <!-- Document lines -->
+  <path d="M6 6h4M6 8h4M6 10h4" stroke="#2563eb" stroke-width="1" stroke-linecap="round"/>
+  
+  <!-- AI circuit symbol -->
+  <circle cx="8" cy="12" r="1" fill="#2563eb"/>
+  <path d="M8 11v-1M7 12h-1M9 12h1" stroke="#2563eb" stroke-width="1" stroke-linecap="round"/>
+</svg> 

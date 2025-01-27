@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Contract Assistant</title>
+  <style>
+    body {
+      width: 300px;
+      padding: 10px;
+      font-family: Arial, sans-serif;
+    }
+    button {
+      width: 100%;
+      padding: 8px;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #1d4ed8;
+    }
+    #status {
+      margin-top: 10px;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 14px;
+      text-align: center;
+    }
+    #status.error {
+      background-color: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+    }
+    #status.success {
+      background-color: #dcfce7;
+      color: #059669;
+      border: 1px solid #bbf7d0;
+    }
+    .header {
+      font-size: 16px;
+      font-weight: bold;
+      color: #1f2937;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .description {
+      font-size: 12px;
+      color: #6b7280;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">Contract Assistant</div>
+  <div class="description">Analyze the current DocuSign contract with Contract Assistant</div>
+  <button id="grabUrl">Analyze Contract</button>
+  <div id="status"></div>
+  <script src="popup.js"></script>
+</body>
+</html> 

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="128" height="128" rx="20" fill="#2563eb"/>
+  
+  <!-- Document shape -->
+  <path d="M32 16h48l16 16v80H32V16z" fill="white"/>
+  
+  <!-- Document lines -->
+  <path d="M48 48h32M48 64h32M48 80h32" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/>
+  
+  <!-- AI circuit symbol -->
+  <circle cx="64" cy="96" r="8" fill="#2563eb"/>
+  <path d="M64 88v-8M56 96h-8M72 96h8" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/>
+  
+  <!-- Document fold -->
+  <path d="M80 16l16 16H80V16z" fill="#e2e8f0"/>
+  
+  <!-- Subtle gradient overlay -->
+  <rect width="128" height="128" rx="20" fill="url(#gradient)" fill-opacity="0.1"/>
+  
+  <!-- Define gradient -->
+  <defs>
+    <linearGradient id="gradient" x1="0" y1="0" x2="128" y2="128">
+      <stop offset="0%" stop-color="white"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </linearGradient>
+  </defs>
+</svg> 
