@@ -98,65 +98,88 @@ const ContractAnalyzer: React.FC = () => {
     }
   };
 
-  const analyzeContract = async (content: string) => {
-    try {
-      setIsAnalyzing(true);
-      setError(null);
+  const analyzeContract = async () => {
+    if (!docusignUrl.trim()) {
+      setError('Please enter a valid DocuSign URL');
+      return;
+    }
 
-      // Initial analysis request
-      const response = await fetch('https://ai-contract-assistant-backend.vercel.app/api/analyze-contract', {
+    if (!validateDocuSignUrl(docusignUrl)) {
+      setError('Please enter a valid DocuSign envelope URL (e.g., https://app.docusign.com/documents/details/envelopes/...)');
+      return;
+    }
+
+    if (!isAuthenticated) {
+      setError('Please authenticate with DocuSign first');
+      return;
+    }
+
+    setIsAnalyzing(true);
+    setError(null);
+
+    try {
+      const token = sessionStorage.getItem('docusign_token');
+      
+      // First, fetch the contract content from DocuSign
+      const contractResponse = await fetch(`${API_BASE_URL}/api/fetch-contract`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json'
         },
-        body: JSON.stringify({ contractContent: content }),
+        credentials: 'include',
+        mode: 'cors',
+        body: JSON.stringify({ 
+          docusignUrl: docusignUrl.trim()
+        }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to analyze contract');
+      if (!contractResponse.ok) {
+        if (contractResponse.status === 401) {
+          sessionStorage.removeItem('docusign_token');
+          setIsAuthenticated(false);
+          throw new Error('Authentication expired. Please sign in again.');
+        }
+        throw new Error('Failed to fetch contract from DocuSign');
       }
 
-      const initialResult = await response.json();
-      setAnalysis(initialResult);
+      const contractData = await contractResponse.json();
 
-      // If the analysis is partial, start polling for updates
-      if (initialResult.isPartial && initialResult.analysisId) {
-        let attempts = 0;
-        const maxAttempts = 10;
-        const pollInterval = 3000; // 3 seconds
+      // Then, analyze the contract using Gemini AI
+      const analysisResponse = await fetch(`${API_BASE_URL}/api/analyze-contract`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        credentials: 'include',
+        mode: 'cors',
+        body: JSON.stringify({ contractContent: contractData.content }),
+      });
 
-        const pollForUpdates = async () => {
-          if (attempts >= maxAttempts) {
-            console.log('Max polling attempts reached');
-            return;
-          }
-
-          try {
-            const statusResponse = await fetch(
-              `https://ai-contract-assistant-backend.vercel.app/api/analyze-contract/status/${initialResult.analysisId}`
-            );
-
-            if (statusResponse.ok) {
-              const statusResult = await statusResponse.json();
-              if (statusResult.status === 'completed') {
-                setAnalysis(statusResult.analysis);
-                return;
-              }
-            }
-
-            attempts++;
-            setTimeout(pollForUpdates, pollInterval);
-          } catch (error) {
-            console.error('Polling error:', error);
-          }
-        };
-
-        // Start polling
-        setTimeout(pollForUpdates, pollInterval);
+      if (!analysisResponse.ok) {
+        const errorData = await analysisResponse.json();
+        throw new Error(errorData.error || 'Failed to analyze contract');
       }
-    } catch (error) {
-      console.error('Contract analysis error:', error);
-      setError('Failed to analyze contract. Please try again.');
+
+      const analysisData = await analysisResponse.json();
+      
+      // Ensure risk score is valid
+      if (typeof analysisData.riskScore !== 'number' || isNaN(analysisData.riskScore)) {
+        throw new Error('Invalid risk score received from analysis');
+      }
+      
+      setAnalysis(analysisData);
+      
+      // Emit event for ContractAssistant
+      const event = new CustomEvent('contractAnalysisComplete', {
+        detail: analysisData
+      });
+      window.dispatchEvent(event);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred during analysis');
+      console.error('Contract analysis error:', err);
     } finally {
       setIsAnalyzing(false);
     }
@@ -468,7 +491,7 @@ const ContractAnalyzer: React.FC = () => {
                   disabled={isAnalyzing}
                 />
                 <button
-                  onClick={() => analyzeContract(docusignUrl.trim())}
+                  onClick={analyzeContract}
                   disabled={isAnalyzing || !docusignUrl.trim()}
                   className={`absolute right-1 top-1 px-4 h-8 rounded-lg text-white text-sm ${
                     isAnalyzing || !docusignUrl.trim()
