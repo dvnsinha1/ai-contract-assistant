@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "installCommand": "npm install",
@@ -19,7 +18,6 @@
     }
   ],
   "env": {
-    "NODE_ENV": "production",
-    "SKIP_PREFLIGHT_CHECK": "true"
+    "NODE_ENV": "production"
   }
 } 
