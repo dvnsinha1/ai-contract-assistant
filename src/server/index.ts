@@ -18,10 +18,9 @@ const port = process.env.PORT ? parseInt(process.env.PORT) : 3001;
 // Enable CORS for all routes with proper configuration
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests from localhost and production domain
+    // Allow requests from localhost and Chrome extension
     const allowedOrigins = [
       process.env.CLIENT_URL || 'http://localhost:5173',
-      'https://ai-contract-assistant.vercel.app',
       /^chrome-extension:\/\/.*/
     ];
     
