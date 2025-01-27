@@ -17,22 +17,8 @@ const port = process.env.PORT ? parseInt(process.env.PORT) : 3001;
 
 // Enable CORS for all routes with proper configuration
 app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests from localhost and Chrome extension
-    const allowedOrigins = [
-      process.env.CLIENT_URL || 'http://localhost:5173',
-      /^chrome-extension:\/\/.*/
-    ];
-    
-    if (!origin || allowedOrigins.some(allowed => 
-      typeof allowed === 'string' ? allowed === origin : allowed.test(origin)
-    )) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'POST', 'OPTIONS'],
+  origin: ['https://ai-contract-assistant.vercel.app', 'http://localhost:5173', 'chrome-extension://*'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
   maxAge: 86400 // 24 hours
