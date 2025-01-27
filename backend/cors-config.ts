@@ -2,14 +2,11 @@ import cors from 'cors';
 
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://ai-contract-assistant.vercel.app', 'https://www.ai-contract-assistant.vercel.app']
-    : ['http://localhost:5173', 'http://localhost:3000'],
+    ? ['https://ai-contract-assistant.vercel.app'] // Replace with your actual frontend URL
+    : ['http://localhost:5173'], // Vite's default development port
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
-  exposedHeaders: ['Content-Length', 'Content-Type'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
-  preflightContinue: false,
-  optionsSuccessStatus: 204
 };
 
 export default cors(corsOptions);
