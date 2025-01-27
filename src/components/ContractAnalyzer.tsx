@@ -22,7 +22,7 @@ interface ContractAnalysis {
 const DOCUSIGN_AUTH_URL = import.meta.env.VITE_DOCUSIGN_AUTH_SERVER || 'https://account-d.docusign.com/oauth/auth';
 const CLIENT_ID = import.meta.env.VITE_DOCUSIGN_CLIENT_ID;
 const REDIRECT_URI = `${window.location.origin}/auth/callback`;
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://ai-contract-assistant-backend.vercel.app';
 
 const validateDocuSignUrl = (url: string): boolean => {
   try {
