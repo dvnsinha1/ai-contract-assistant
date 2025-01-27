@@ -93,6 +93,91 @@ npm run test
 yarn test
 ```
 
+## Deployment
+
+### Vercel Deployment
+
+You can deploy this project on Vercel either through the UI or CLI.
+
+#### Option 1: UI Deployment (Recommended)
+
+1. Push your code to GitHub if you haven't already
+
+2. Go to [Vercel Dashboard](https://vercel.com/dashboard)
+   - Click "Add New Project"
+   - Choose "Import Git Repository"
+   - Select your AI Contract Assistant repository
+   - Vercel will auto-detect project settings
+
+3. Configure Project:
+   - Framework Preset: Select "Other"
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
+   - Install Command: `npm install`
+
+4. Environment Variables:
+   - Click "Environment Variables" section
+   - Add all variables from your `.env` file:
+     - `DATABASE_URL`
+     - `JWT_SECRET`
+     - `AI_API_KEY`
+     - Any other required variables
+
+5. Click "Deploy"
+   - Vercel will build and deploy your application
+   - You'll get a production URL like `https://your-project.vercel.app`
+
+6. Custom Domain (Optional):
+   - Go to Project Settings > Domains
+   - Add your custom domain and follow DNS configuration instructions
+
+#### Option 2: CLI Deployment
+
+1. Install Vercel CLI:
+```bash
+npm install -g vercel
+# or
+yarn global add vercel
+```
+
+2. Login to Vercel:
+```bash
+vercel login
+```
+
+3. Configure Vercel:
+Create a `vercel.json` in the root directory:
+```json
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "installCommand": "npm install",
+  "builds": [
+    { "src": "frontend/**", "use": "@vercel/static" },
+    { "src": "api/**", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/(.*)", "dest": "/frontend/$1" }
+  ]
+}
+```
+
+4. Deploy:
+```bash
+vercel
+```
+
+5. Set environment variables in Vercel:
+   - Go to your Vercel project dashboard
+   - Navigate to Settings > Environment Variables
+   - Add all required variables from your `.env` file
+
+The application will be deployed with automatic CI/CD on every push to the main branch.
+
+Production URL: [https://ai-contract-assistant.vercel.app](https://ai-contract-assistant.vercel.app)
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
