@@ -2,25 +2,31 @@
   "manifest_version": 3,
   "name": "Docusign Contract Assistant",
   "version": "1.0",
-  "description": "Automatically analyze contracts from DocuSign URLs with Contract Assistant",
+  "description": "Analyze DocuSign contracts with AI",
   "permissions": [
     "activeTab",
-    "tabs",
-    "scripting"
+    "tabs"
   ],
   "host_permissions": [
-    "http://localhost:3001/*",
-    "http://localhost:5173/*",
-    "https://ai-contract-assistant.vercel.app/*"
+    "https://ai-contract-assistant-backend.vercel.app/*",
+    "https://ai-contract-assistant.vercel.app/*",
+    "https://*.docusign.com/*",
+    "https://*.docusign.net/*"
   ],
   "background": {
     "service_worker": "background.js"
   },
   "action": {
     "default_popup": "popup.html",
-    "default_icon": "icon.png"
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    }
   },
   "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
     "128": "icon.png"
   }
 } 

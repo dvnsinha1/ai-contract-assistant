@@ -6,6 +6,7 @@ import * as dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 import { parsePDF } from './utils/pdfParser.js';
+import type { CorsCallback } from 'cors';
 
 // Load environment variables
 const __filename = fileURLToPath(import.meta.url);
@@ -17,7 +18,24 @@ const port = process.env.PORT ? parseInt(process.env.PORT) : 3001;
 
 // Enable CORS for all routes with proper configuration
 app.use(cors({
-  origin: ['https://ai-contract-assistant.vercel.app', 'http://localhost:5173', 'chrome-extension://*'],
+  origin: function(origin: string | undefined, callback: CorsCallback) {
+    // Allow requests from:
+    // 1. Chrome extension (chrome-extension://)
+    // 2. Frontend app (production and development)
+    // 3. Postman/local testing (null/undefined origin)
+    const allowedOrigins = [
+      'https://ai-contract-assistant.vercel.app',
+      'http://localhost:5173'
+    ];
+
+    if (!origin || // Allow requests with no origin (mobile apps, curl, etc)
+        origin.startsWith('chrome-extension://') || // Allow any Chrome extension
+        allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
@@ -27,7 +45,7 @@ app.use(cors({
 // Handle preflight requests
 app.options('*', cors());
 
-app.use(express.json());
+app.use(express.json({ limit: '10mb' })); // Increase payload limit for large contracts
 
 // Add endpoint to receive URLs from Chrome extension
 app.post('/api/contract/url', async (req: Request, res: Response) => {
@@ -504,7 +522,7 @@ app.post('/api/analyze-contract', async (req: Request, res: Response) => {
         3. Critical issues
 
         Contract section:
-        ${chunk}
+          ${chunk}
 
         Format:
         SUMMARY: [Brief summary]
@@ -533,7 +551,7 @@ app.post('/api/analyze-contract', async (req: Request, res: Response) => {
     );
 
     // Quick synthesis of results
-    const synthesisPrompt = `
+      const synthesisPrompt = `
       Synthesize these contract analysis results briefly:
       ${chunkAnalyses.join('\n---\n')}
 
@@ -543,9 +561,9 @@ app.post('/api/analyze-contract', async (req: Request, res: Response) => {
       3. 3-5 key points
       4. 2-3 main issues
       5. 2-3 recommendations
-    `;
+      `;
 
-    const model = await initializeGeminiModel('analysis');
+      const model = await initializeGeminiModel('analysis');
     const synthesisResult = await Promise.race([
       model.generateContent(synthesisPrompt),
       timeoutPromise
