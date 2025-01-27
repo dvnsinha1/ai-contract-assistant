@@ -18,6 +18,23 @@ document.addEventListener('DOMContentLoaded', function() {
     statusDiv.className = type; // 'error' or 'success'
   };
 
+  // Function to get the API base URL
+  const getApiBaseUrl = () => {
+    // Check if we're in development mode (you can add more sophisticated checks)
+    if (process.env.NODE_ENV === 'development') {
+      return 'http://localhost:3001';
+    }
+    return 'https://ai-contract-assistant.vercel.app';
+  };
+
+  // Function to get the client URL
+  const getClientUrl = () => {
+    if (process.env.NODE_ENV === 'development') {
+      return 'http://localhost:5173';
+    }
+    return 'https://ai-contract-assistant.vercel.app';
+  };
+
   grabUrlButton.addEventListener('click', async () => {
     try {
       // Get the current tab's URL
@@ -31,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
 
       // Send the URL to your Contract Assistant application
-      const response = await fetch('http://localhost:3001/api/contract/url', {
+      const response = await fetch(`${getApiBaseUrl()}/api/contract/url`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -48,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Find or create frontend tab
         const frontendTabs = await chrome.tabs.query({
-          url: 'http://localhost:5173/*'
+          url: `${getClientUrl()}/*`
         });
 
         if (frontendTabs.length > 0) {
@@ -58,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
           // No frontend tab found, create one
           chrome.tabs.create({ 
-            url: 'http://localhost:5173'
+            url: getClientUrl()
           });
         }
 
@@ -69,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
         throw new Error(errorData.error || 'Failed to send URL');
       }
     } catch (error) {
-      showStatus('Error: ' + error.message, 'error');
+      showStatus(`Error: ${error.message}`, 'error');
     }
   });
 }); 
